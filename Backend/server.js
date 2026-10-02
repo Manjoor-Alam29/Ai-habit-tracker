@@ -9,6 +9,31 @@ import aiRoutes from './routes/ai.js';
 import { notFound, errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
+let isconneted = false;
+    async function connectToDB() {
+     try{
+          await mongoose.connect(process.env.MONGO_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,         
+     });
+     isconneted = true;
+     console.log('Connected to MongoDB');
+     }
+     catch (error) {
+        console.error('Error connecting to MongoDB:', error);
+     }
+    }
+  
+    //adding middleware
+    app.use((req, res, next) => {
+      if (!isconneted) {
+        connectToDB().then(() => next());
+      }
+    });
+
+
+
+
 
 const allowedOrigins = (process.env.CLIENT_URL || '')
     .split(',') 
@@ -54,8 +79,10 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 8000;
 
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-});
+// connectDB().then(() => {
+//   app.listen(PORT, () => {
+//     console.log(`Server running on http://localhost:${PORT}`);
+//   });
+// });
+
+module.exports = app;
