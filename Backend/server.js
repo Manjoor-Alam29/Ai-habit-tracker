@@ -9,7 +9,6 @@ import logRoutes from './routes/log.js';
 import aiRoutes from './routes/ai.js';
 import { notFound, errorHandler } from './middleware/errorHandler.js';
 
-
 const app = express();
 
 
