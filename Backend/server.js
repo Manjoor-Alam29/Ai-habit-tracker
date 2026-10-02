@@ -7,7 +7,7 @@ import habitRoutes from './routes/Habit.js';
 import logRoutes from './routes/log.js';
 import aiRoutes from './routes/ai.js';
 import { notFound, errorHandler } from './middleware/errorHandler.js';
-import express from 'express';
+
 
 const app = express();
 app.use(express.json());
