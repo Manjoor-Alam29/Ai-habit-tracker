@@ -5,9 +5,10 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server",
     "dev": "nodemon server.js",
-    "seed": "node scripts/seed.js"
+    "vercel-start": "node server.js"
+    
   },
   "dependencies": {
     "@google/genai": "^1.50.1",
