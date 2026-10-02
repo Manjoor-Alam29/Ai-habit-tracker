@@ -7,8 +7,17 @@ import habitRoutes from './routes/Habit.js';
 import logRoutes from './routes/log.js';
 import aiRoutes from './routes/ai.js';
 import { notFound, errorHandler } from './middleware/errorHandler.js';
+import express from 'express';
 
 const app = express();
+app.use(express.json());
+
+// Your routes
+app.get("/", (req, res) => {
+    res.json({ message: "API is working" });
+});
+
+
 let isconneted = false;
     async function connectToDB() {
      try{
@@ -77,7 +86,7 @@ app.use("/api/ai", aiRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 8000;
+// const PORT = process.env.PORT || 8000;
 
 // connectDB().then(() => {
 //   app.listen(PORT, () => {
