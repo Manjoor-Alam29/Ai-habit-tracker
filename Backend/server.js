@@ -10,12 +10,7 @@ import { notFound, errorHandler } from './middleware/errorHandler.js';
 
 
 const app = express();
-app.use(express.json());
 
-// Your routes
-app.get("/", (req, res) => {
-    res.json({ message: "API is working" });
-});
 
 
 let isconneted = false;
@@ -71,6 +66,12 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
 app.use(express.json({ limit: "1mb" }));
+app.use(express.json());
+
+// Your routes
+app.get("/", (req, res) => {
+    res.json({ message: "API is working" });
+});
 
 app.get("/api/health", (req, res) =>
   res.json({ status: "ok", time: new Date().toISOString() })
