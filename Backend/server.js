@@ -17,8 +17,8 @@ let isconneted = false;
     async function connectToDB() {
      try{
           await mongoose.connect(process.env.MONGO_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,         
+            // useNewUrlParser: true,
+            // useUnifiedTopology: true,         
      });
      isconneted = true;
      console.log('Connected to MongoDB');
