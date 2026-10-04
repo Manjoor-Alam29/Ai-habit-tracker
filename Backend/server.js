@@ -52,10 +52,10 @@ app.use(
   })
 );
 
-const allowedOrigins = (process.env.CLIENT_URL || "")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+// const allowedOrigins = (process.env.CLIENT_URL || "")
+//   .split(",")
+//   .map((origin) => origin.trim())
+//   .filter(Boolean);
 
 const corsOptions = {
   origin: (origin, callback) => {
