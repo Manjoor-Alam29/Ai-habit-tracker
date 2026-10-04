@@ -18,42 +18,81 @@ const app = express();
 // CORS
 // ===============================
 
-const allowedOrigins = (process.env.CLIENT_URL || "")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+// const allowedOrigins = (process.env.CLIENT_URL || "")
+//   .split(",")
+//   .map((origin) => origin.trim())
+//   .filter(Boolean);
 
-const corsOptions = {
-  origin: (origin, callback) => {
-    // Allow requests without an Origin
-    if (!origin) {
-      return callback(null, true);
-    }
+// const corsOptions = {
+//   origin: (origin, callback) => {
+//     // Allow requests without an Origin
+//     if (!origin) {
+//       return callback(null, true);
+//     }
 
-    // Allow localhost during development
-    const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(
-      origin
-    );
+//     // Allow localhost during development
+//     const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(
+//       origin
+//     );
 
-    if (isLocalhost) {
-      return callback(null, true);
-    }
+//     if (isLocalhost) {
+//       return callback(null, true);
+//     }
 
-    // Allow frontend URL from environment variable
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
+//     // Allow frontend URL from environment variable
+//     if (allowedOrigins.includes(origin)) {
+//       return callback(null, true);
+//     }
 
-    return callback(new Error(`Origin ${origin} not allowed by CORS`));
-  },
+//     return callback(new Error(`Origin ${origin} not allowed by CORS`));
+//   },
 
-  credentials: true,
+//   credentials: true,
 
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+//   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
+//   allowedHeaders: ["Content-Type", "Authorization"],
+// };
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "https://ai-habit-tracker-xtup.vercel.app",
+];
 
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests without an origin
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      console.log("CORS blocked:", origin);
+
+      return callback(new Error(`CORS blocked: ${origin}`));
+    },
+
+    credentials: true,
+
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS",
+    ],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
+  })
+);
 app.use(cors(corsOptions));
 
 // ===============================
