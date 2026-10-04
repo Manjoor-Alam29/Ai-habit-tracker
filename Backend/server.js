@@ -94,8 +94,8 @@ app.use(errorHandler);
     });
 
 // Your routes
-app.get("/", (req, res) => {
-    res.json({ message: "API is working" });
-});
+// app.get("/", (req, res) => {
+//     res.json({ message: "API is working" });
+// });
 
 export default app;
