@@ -92,7 +92,7 @@ app.use(errorHandler);
 //   });
 // });
 
-Your routes
+// Your routes
 app.get("/", (req, res) => {
     res.json({ message: "API is working" });
 });
