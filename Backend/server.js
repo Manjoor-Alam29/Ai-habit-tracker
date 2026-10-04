@@ -28,12 +28,7 @@ let isconneted = false;
      }
     }
   
-    //adding middleware
-    app.use((req, res, next) => {
-      if (!isconneted) {
-        connectToDB().then(() => next());
-      }
-    });
+
 
 
 
@@ -91,6 +86,12 @@ app.use(errorHandler);
 //     console.log(`Server running on http://localhost:${PORT}`);
 //   });
 // });
+    //adding middleware
+    app.use((req, res, next) => {
+      if (!isconneted) {
+        connectToDB().then(() => next());
+      }
+    });
 
 // Your routes
 app.get("/", (req, res) => {
