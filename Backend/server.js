@@ -79,19 +79,19 @@ app.use("/api/ai", aiRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-// const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8000;
 
-// connectDB().then(() => {
-//   app.listen(PORT, () => {
-//     console.log(`Server running on http://localhost:${PORT}`);
-//   });
-// });
+connectToDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+});
     //adding middleware
-    app.use((req, res, next) => {
-      if (!isconneted) {
-        connectToDB().then(() => next());
-      }
-    });
+    // app.use((req, res, next) => {
+    //   if (!isconneted) {
+    //     connectToDB().then(() => next());
+    //   }
+    // });
 
 // Your routes
 // app.get("/", (req, res) => {
