@@ -1,101 +1,133 @@
-import 'dotenv/config';
-import express from 'express';
-import mongoose from 'mongoose';
-import cors from 'cors';
-// import connectDB from './config/db.js';
-import authRoutes from './routes/auth.js';
-import habitRoutes from './routes/Habit.js';
-import logRoutes from './routes/log.js';
-import aiRoutes from './routes/ai.js';
-import { notFound, errorHandler } from './middleware/errorHandler.js';
+
+import "dotenv/config";
+
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+
+import authRoutes from "./routes/auth.js";
+import habitRoutes from "./routes/Habit.js";
+import logRoutes from "./routes/log.js";
+import aiRoutes from "./routes/ai.js";
+
+import { notFound, errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 
+// ===============================
+// CORS
+// ===============================
 
-
-let isconneted = false;
-    async function connectToDB() {
-     try{
-          await mongoose.connect(process.env.MONGO_URI, {
-            // useNewUrlParser: true,
-            // useUnifiedTopology: true,         
-     });
-     isconneted = true;
-     console.log('Connected to MongoDB');
-     }
-     catch (error) {
-        console.error('Error connecting to MongoDB:', error);
-     }
-    }
-  
-
-
-
-
-
-
-const allowedOrigins = (process.env.CLIENT_URL || '')
-    .split(',') 
-    .map((s)=> s.trim())  
-    .filter(Boolean);
+const allowedOrigins = (process.env.CLIENT_URL || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 const corsOptions = {
-  origin(origin, cb) {
-    // Allow requests with no origin (curl, same-origin, server-to-server)
-    if (!origin) return cb(null, true);
-    
-    // Allow any localhost / 127.0.0.1 origin in development
-    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
-      return cb(null, true);
+  origin: (origin, callback) => {
+    // Allow requests without an Origin
+    if (!origin) {
+      return callback(null, true);
     }
-    
-    // Allow anything explicitly listed in CLIENT_URL (comma-separated)
-    if (allowedOrigins.includes(origin)) return cb(null, true);
-    return cb(new Error(`Origin ${origin} not allowed by CORS`));
+
+    // Allow localhost during development
+    const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(
+      origin
+    );
+
+    if (isLocalhost) {
+      return callback(null, true);
+    }
+
+    // Allow frontend URL from environment variable
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Origin ${origin} not allowed by CORS`));
   },
+
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+
+// ===============================
+// BODY PARSER
+// ===============================
+
 app.use(express.json({ limit: "1mb" }));
-app.use(express.json());
 
+// ===============================
+// DATABASE CONNECTION
+// ===============================
 
+let isConnected = false;
 
-app.get("/api/health", (req, res) =>
-  res.json({ status: "ok", time: new Date().toISOString() })
-);
+async function connectToDB() {
+  if (isConnected) {
+    return;
+  }
 
-// ------------------Routes-------------
- app.use("/api/auth", authRoutes);
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+
+    isConnected = true;
+
+    console.log("Connected to MongoDB");
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
+    throw error;
+  }
+}
+
+// Connect to MongoDB before handling requests
+app.use(async (req, res, next) => {
+  try {
+    await connectToDB();
+    next();
+  } catch (error) {
+    res.status(500).json({
+      message: "Database connection failed",
+      error: error.message,
+    });
+  }
+});
+
+// ===============================
+// HEALTH CHECK
+// ===============================
+
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "ok",
+    message: "AI Habit Tracker API is running",
+    time: new Date().toISOString(),
+  });
+});
+
+// ===============================
+// ROUTES
+// ===============================
+
+app.use("/api/auth", authRoutes);
 app.use("/api/habits", habitRoutes);
 app.use("/api/logs", logRoutes);
 app.use("/api/ai", aiRoutes);
 
+// ===============================
+// ERROR HANDLING
+// ===============================
 
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 8000;
+// ===============================
+// EXPORT APP FOR VERCEL
+// ===============================
 
-connectToDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-});
-    //adding middleware
-    // app.use((req, res, next) => {
-    //   if (!isconneted) {
-    //     connectToDB().then(() => next());
-    //   }
-    // });
-
-// Your routes
-// app.get("/", (req, res) => {
-//     res.json({ message: "API is working" });
-// });
-
-// export default app;
+export default app;
